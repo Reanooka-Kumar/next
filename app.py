@@ -115,6 +115,7 @@ def render_login_page():
             max-width: 700px;
             margin-left: auto;
             margin-right: auto;
+            text-align: center;
         }
         
         /* Features list styling */
