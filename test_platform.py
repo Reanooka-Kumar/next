@@ -101,6 +101,32 @@ def test_pipeline():
     assert 'Python' in resume_analysis['skills_found'], "Skills found missing Python"
     print(f"[PASS] Resume Analyzer working. ATS Score: {resume_analysis['ats_score']}/100")
     
+    # 8. Test AI Interview Coach
+    print("Testing AI Interview Coach...")
+    from src.interview_coach import generate_ai_question, evaluate_ai_answer, get_gemini_client
+    from dotenv import load_dotenv
+    load_dotenv()
+    
+    if not get_gemini_client():
+        print("[SKIP] AI Interview Coach (Skipped: No GEMINI_API_KEY in environment or .env file)")
+    else:
+        print("Gemini API key configuration found. Querying live endpoint...")
+        q_meta = generate_ai_question("Data Scientist")
+        if 'error' in q_meta:
+            print(f"[SKIP] AI Interview Coach live test skipped due to API error: {q_meta['error']}")
+        else:
+            assert 'question' in q_meta, "Question string missing from response schema"
+            assert 'concepts' in q_meta, "Concepts checklist missing from response schema"
+            
+            user_ans = "L1 lasso regularization adds an absolute penalty which drives weights to zero and performs feature selection."
+            review = evaluate_ai_answer("Data Scientist", q_meta['question'], q_meta['concepts'], user_ans)
+            if 'error' in review:
+                print(f"[SKIP] AI Interview Coach evaluation skipped due to API error: {review['error']}")
+            else:
+                assert review['score'] >= 0.0, "Score parameter should be numeric"
+                assert 'rating' in review, "Rating missing from response schema"
+                print(f"[PASS] AI Interview Coach working. Score: {review['score']}/100, Rating: {review['rating']}")
+    
     print("\n[SUCCESS] ALL TESTS PASSED SUCCESSFULLY! The system is highly stable and production-ready.")
 
 if __name__ == "__main__":
