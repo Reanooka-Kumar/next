@@ -112,11 +112,16 @@ def map_raw_df_to_features(df):
     
     # 6. Target Labels (if present in df)
     if 'PlacementStatus' in df.columns:
-        # support both Placed/NotPlaced and 1/0
-        if df['PlacementStatus'].dtype == object:
-            processed['PlacementStatus'] = df['PlacementStatus'].map({'Placed': 1, 'NotPlaced': 0, 'Not Placed': 0}).fillna(0)
+        # support both Placed/NotPlaced labels and numeric 1/0 values across all pandas string types
+        status_str = df['PlacementStatus'].astype(str)
+        if status_str.str.contains('Placed|NotPlaced|Not Placed', case=False).any():
+            processed['PlacementStatus'] = status_str.map({
+                'Placed': 1, 'placed': 1, 
+                'NotPlaced': 0, 'notplaced': 0, 
+                'Not Placed': 0, 'not placed': 0
+            }).fillna(0).astype(int)
         else:
-            processed['PlacementStatus'] = df['PlacementStatus'].astype(int)
+            processed['PlacementStatus'] = df['PlacementStatus'].astype(float).astype(int)
             
     if 'Expected Salary' in df.columns:
         processed['Expected Salary'] = df['Expected Salary'].astype(float)
