@@ -252,6 +252,22 @@ def render_login_page():
             border-color: #6366F1 !important;
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
         }
+        /* Force secondary buttons (like Sign In and Back Home) to remain white background with dark text always */
+        button[data-testid="baseButton-secondary"] {
+            background-color: #FFFFFF !important;
+            color: #0F172A !important;
+            border: 1px solid #E2E8F0 !important;
+            transition: all 0.2s ease-in-out !important;
+            font-weight: 600 !important;
+        }
+        button[data-testid="baseButton-secondary"]:hover, 
+        button[data-testid="baseButton-secondary"]:focus, 
+        button[data-testid="baseButton-secondary"]:active {
+            background-color: #FFFFFF !important;
+            color: #6366F1 !important;
+            border-color: #6366F1 !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2) !important;
+        }
         
         /* Divider line styling */
         hr {
@@ -264,14 +280,14 @@ def render_login_page():
     # 1. Header Navigation Bar
     col_logo, col_action = st.columns([5, 1])
     with col_logo:
-        st.markdown("<h3 style='margin: 0; color: #FFFFFF; font-family: \"Outfit\", sans-serif; font-weight: 700; letter-spacing: -0.5px;'>🌌 NextCareer AI</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='margin: 0; color: #FFFFFF; font-family: \"Outfit\", sans-serif; font-weight: 700; letter-spacing: -0.5px;'>NextCareer AI</h3>", unsafe_allow_html=True)
     with col_action:
         if st.session_state.landing_view == 'home':
-            if st.button("🔒 Sign In", use_container_width=True, type="secondary"):
+            if st.button("Sign In", use_container_width=True, type="secondary"):
                 st.session_state.landing_view = 'login'
                 st.rerun()
         else:
-            if st.button("← Back Home", use_container_width=True, type="secondary"):
+            if st.button("Back Home", use_container_width=True, type="secondary"):
                 st.session_state.landing_view = 'home'
                 st.rerun()
                 
@@ -282,7 +298,7 @@ def render_login_page():
         # Hero Branding Page
         st.markdown("""
         <div class="brand-hero">
-            <div class="brand-badge">🚀 AI-POWERED CAREER INTELLIGENCE</div>
+            <div class="brand-badge">AI-POWERED CAREER INTELLIGENCE</div>
             <div class="brand-title">Predict. Prepare. Elevate.</div>
             <div class="brand-subtitle">Placement Insights & Talent Accelerator Suite</div>
             <div class="brand-desc" style="text-align: center !important;">
@@ -295,7 +311,7 @@ def render_login_page():
         # Access Portal Center Button
         _, col_center_btn, _ = st.columns([1.3, 1, 1.3])
         with col_center_btn:
-            if st.button("⚡ Get Started / Enter Portal", use_container_width=True, type="primary"):
+            if st.button("Get Started / Enter Portal", use_container_width=True, type="primary"):
                 st.session_state.landing_view = 'login'
                 st.rerun()
                 
@@ -311,7 +327,7 @@ def render_login_page():
             st.markdown("""
             <div class="feature-card">
                 <div class="feature-item">
-                    <div class="feature-icon">🔮</div>
+                    <div class="feature-icon" style="color: #6366F1; font-weight: 700; font-family: 'Outfit', sans-serif;">01</div>
                     <div class="feature-text">
                         <strong>Placement Predictor</strong>
                         <p>Project your career outcomes and initial packages based on academic benchmarks.</p>
@@ -324,7 +340,7 @@ def render_login_page():
             st.markdown("""
             <div class="feature-card">
                 <div class="feature-item">
-                    <div class="feature-icon">🎯</div>
+                    <div class="feature-icon" style="color: #6366F1; font-weight: 700; font-family: 'Outfit', sans-serif;">02</div>
                     <div class="feature-text">
                         <strong>Skill Alignment Map</strong>
                         <p>Compare your skills against career targets to identify upskilling needs.</p>
@@ -340,7 +356,7 @@ def render_login_page():
             st.markdown("""
             <div class="feature-card">
                 <div class="feature-item">
-                    <div class="feature-icon">📝</div>
+                    <div class="feature-icon" style="color: #6366F1; font-weight: 700; font-family: 'Outfit', sans-serif;">03</div>
                     <div class="feature-text">
                         <strong>Resume Profile Grader</strong>
                         <p>Evaluate your resume's competitive strength and industry readiness.</p>
@@ -353,7 +369,7 @@ def render_login_page():
             st.markdown("""
             <div class="feature-card">
                 <div class="feature-item">
-                    <div class="feature-icon">🤖</div>
+                    <div class="feature-icon" style="color: #6366F1; font-weight: 700; font-family: 'Outfit', sans-serif;">04</div>
                     <div class="feature-text">
                         <strong>AI Interview Simulator</strong>
                         <p>Refine your communication and core knowledge with interactive live mock simulations.</p>
@@ -399,7 +415,7 @@ def render_login_page():
                 password = st.text_input("Password", type="password")
                 
                 st.write("")
-                login_btn = st.button("🔑 Access Account Portal", use_container_width=True, type="primary")
+                login_btn = st.button("Access Account Portal", use_container_width=True, type="primary")
                 
                 if login_btn:
                     if role == "Admin":
