@@ -55,14 +55,19 @@ def render_login_page():
             background-position: center top !important;
         }
         
-        [data-testid="stHeader"], [data-testid="stSidebar"] {
+        [data-testid="stHeader"], [data-testid="stSidebar"], header[data-testid="stHeader"] {
             display: none !important;
+            height: 0px !important;
+            min-height: 0px !important;
         }
         
         /* Reduce vertical gap and align header navigation elements to the very top */
+        .block-container,
+        [data-testid="stAppViewBlockContainer"],
         .main .block-container {
-            padding-top: 1rem !important;
+            padding-top: 0.5rem !important;
             padding-bottom: 1rem !important;
+            margin-top: 0rem !important;
         }
         
         /* Brand container styling */
