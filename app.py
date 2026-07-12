@@ -875,7 +875,7 @@ if routing_selection == "🏢 Dashboard Analytics":
 # MODULE 2 & 3 & 4 & 5 & 8: Student Prediction & XAI
 # ==========================================
 elif routing_selection == "🔮 Predict Placement & XAI":
-    st.title("🔮 Predictive Student Placement & Explainable AI Engine")
+    st.title("Placement Prediction & AI Insights")
     st.markdown("Input student parameters to forecast placement outcomes, calculate salary packages, and render visual SHAP attribution charts.")
     
     if not predictor.is_ready():
