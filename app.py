@@ -280,10 +280,10 @@ def render_login_page():
             <div class="brand-badge">🚀 AI-POWERED CAREER INTELLIGENCE</div>
             <div class="brand-title">Predict. Prepare. Elevate.</div>
             <div class="brand-subtitle">Placement Insights & Talent Accelerator Suite</div>
-            <p class="brand-desc" style="text-align: center !important;">
+            <div class="brand-desc" style="text-align: center !important;">
                 NextCareer AI evaluates your academic and professional profile to predict placement success, 
                 identify strategic upskilling needs, and host mock simulations designed to secure your target offer.
-            </p>
+            </div>
         </div>
         """, unsafe_allow_html=True)
         
