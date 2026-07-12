@@ -253,16 +253,27 @@ def render_login_page():
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
         }
         /* Force secondary buttons (like Sign In and Back Home) to remain white background with dark text always */
+        div[data-testid="stButton"] button[data-testid="baseButton-secondary"],
+        .stButton button[data-testid="baseButton-secondary"],
         button[data-testid="baseButton-secondary"] {
+            background: #FFFFFF !important;
             background-color: #FFFFFF !important;
             color: #0F172A !important;
             border: 1px solid #E2E8F0 !important;
             transition: all 0.2s ease-in-out !important;
             font-weight: 600 !important;
         }
+        
+        div[data-testid="stButton"] button[data-testid="baseButton-secondary"]:hover, 
+        div[data-testid="stButton"] button[data-testid="baseButton-secondary"]:focus, 
+        div[data-testid="stButton"] button[data-testid="baseButton-secondary"]:active,
+        .stButton button[data-testid="baseButton-secondary"]:hover, 
+        .stButton button[data-testid="baseButton-secondary"]:focus, 
+        .stButton button[data-testid="baseButton-secondary"]:active,
         button[data-testid="baseButton-secondary"]:hover, 
         button[data-testid="baseButton-secondary"]:focus, 
         button[data-testid="baseButton-secondary"]:active {
+            background: #FFFFFF !important;
             background-color: #FFFFFF !important;
             color: #6366F1 !important;
             border-color: #6366F1 !important;
