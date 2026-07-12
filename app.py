@@ -707,27 +707,27 @@ explainer = get_explainer_assets()
 # -------------------------------------------------------------
 with st.sidebar:
     st.image("https://img.icons8.com/nolan/128/graduation-cap.png", width=70)
-    st.title("PIP Platform")
-    st.subheader("Placement Intelligence Platform")
+    st.title("NextCareer AI")
+    st.subheader("Placement & Career Intelligence")
     st.write("---")
     
     # Role-based Navigation list
     if st.session_state.user_role == 'admin':
         nav_options = [
-            "🏢 Dashboard Analytics",
-            "🔮 Predict Placement & XAI",
-            "🎯 Skill Gap & Career Roadmap",
-            "📝 Resume ATS Scorer",
-            "🤖 AI Interview Coach",
-            "📊 Model Benchmarking",
-            "💾 History & Data Management"
+            "Dashboard Analytics",
+            "Predict Placement",
+            "Skill Gap & Career Roadmap",
+            "Resume ATS Scorer",
+            "AI Interview Coach",
+            "Model Benchmarking",
+            "History & Data Management"
         ]
     else:
         nav_options = [
-            "🔮 My Placement Prediction & XAI",
-            "🎯 My Skill Gap & Roadmap",
-            "📝 My Resume ATS Scorer",
-            "🤖 My AI Interview Coach"
+            "My Placement Prediction",
+            "My Skill Gap & Roadmap",
+            "My Resume ATS Scorer",
+            "My AI Interview Coach"
         ]
         
     nav_selection = st.radio("Navigation Menu", options=nav_options)
@@ -735,27 +735,27 @@ with st.sidebar:
     # Map navigation selections for routing
     routing_selection = nav_selection
     if "Predict Placement" in nav_selection or "My Placement" in nav_selection:
-        routing_selection = "🔮 Predict Placement & XAI"
+        routing_selection = "Predict Placement"
     elif "Skill Gap" in nav_selection or "My Skill Gap" in nav_selection:
-        routing_selection = "🎯 Skill Gap & Career Roadmap"
+        routing_selection = "Skill Gap & Career Roadmap"
     elif "Resume" in nav_selection:
-        routing_selection = "📝 Resume ATS Scorer"
+        routing_selection = "Resume ATS Scorer"
     elif "Interview" in nav_selection:
-        routing_selection = "🤖 AI Interview Coach"
+        routing_selection = "AI Interview Coach"
         
     st.write("---")
     # Theme toggler
-    mode_emoji = "☀️ Light" if st.session_state.theme_mode == 'dark' else "🌙 Dark"
+    mode_emoji = "Light" if st.session_state.theme_mode == 'dark' else "Dark"
     st.button(f"Switch to {mode_emoji} Mode", on_click=toggle_theme, use_container_width=True)
     
     st.write("---")
-    if st.button("🚪 Log Out", use_container_width=True):
+    if st.button("Log Out", use_container_width=True):
         st.session_state.logged_in = False
         st.session_state.user_role = None
         st.rerun()
         
     st.write("---")
-    st.caption("© 2026 Placement Intelligence Platform. Production-Quality AI Advisory System.")
+    st.caption("© 2026 NextCareer AI. Production-Quality AI Advisory System.")
 
 # -------------------------------------------------------------
 # 3. Helper Functions
@@ -776,8 +776,8 @@ df_students = load_dataset()
 # ==========================================
 # MODULE 1: Dashboard Analytics
 # ==========================================
-if routing_selection == "🏢 Dashboard Analytics":
-    st.title("🏢 Institutional Placement Analytics Dashboard")
+if routing_selection == "Dashboard Analytics":
+    st.title("Institutional Placement Analytics Dashboard")
     st.markdown("A comprehensive, company-grade overview of students' academic profiles, skill distributions, and predicted placement indices.")
     
     if df_students.empty:
@@ -872,9 +872,9 @@ if routing_selection == "🏢 Dashboard Analytics":
                 st.plotly_chart(fig_heat, use_container_width=True)
 
 # ==========================================
-# MODULE 2 & 3 & 4 & 5 & 8: Student Prediction & XAI
+# MODULE 2 & 3 & 4 & 5 & 8: Student Prediction
 # ==========================================
-elif routing_selection == "🔮 Predict Placement & XAI":
+elif routing_selection == "Predict Placement":
     st.title("Placement Prediction & AI Insights")
     st.markdown("Input student parameters to forecast placement outcomes, calculate salary packages, and render visual SHAP attribution charts.")
     
@@ -993,7 +993,7 @@ elif routing_selection == "🔮 Predict Placement & XAI":
             
             # 2. Placement Probability Gauge
             with st.container(border=True):
-                st.markdown("### 🎯 Placement Probability Gauge")
+                st.markdown("### Placement Probability Gauge")
                 
                 fig_gauge = go.Figure(go.Indicator(
                     mode = "gauge+number",
@@ -1039,7 +1039,7 @@ elif routing_selection == "🔮 Predict Placement & XAI":
                 pdf_data = pdf_buffer.getvalue()
                 
                 st.download_button(
-                    label="📥 Download Detailed Career & Placement Report (PDF)",
+                    label="Download Detailed Career & Placement Report (PDF)",
                     data=pdf_data,
                     file_name=f"Placement_Assessment_{name.replace(' ', '_')}.pdf",
                     mime="application/pdf",
@@ -1050,9 +1050,9 @@ elif routing_selection == "🔮 Predict Placement & XAI":
                 
             st.write("---")
             
-            # 3. Explainable AI (SHAP Plots)
+            # 3. Feature Attribution Insights
             with st.container(border=True):
-                st.markdown("### 🧮 Explainable AI (XAI) Attribution")
+                st.markdown("### Feature Attribution Insights")
                 st.markdown("Interpret which parameters positively and negatively influence the classification output.")
                 
                 with st.spinner("Extracting model explanation values..."):
@@ -1073,12 +1073,12 @@ elif routing_selection == "🔮 Predict Placement & XAI":
                 # Positives vs Negatives Highlights
                 col_pos, col_neg = st.columns(2)
                 with col_pos:
-                    st.markdown("##### 🚀 Top Features Boosting Your Chances")
+                    st.markdown("##### Top Features Boosting Your Chances")
                     for item in shap_results['positive_influences'][:4]:
                         st.markdown(f"- **{item['friendly_name']}** (`{item['raw_value']}`): added **+{item['shap_value']*100:.1f}%** chance.")
                         
                 with col_neg:
-                    st.markdown("##### 📉 Top Areas Limiting Your Chances")
+                    st.markdown("##### Top Areas Limiting Your Chances")
                     for item in shap_results['negative_influences'][:4]:
                         st.markdown(f"- **{item['friendly_name']}** (`{item['raw_value']}`): reduced chances by **{item['shap_value']*100:.1f}%**.")
             
@@ -1086,7 +1086,7 @@ elif routing_selection == "🔮 Predict Placement & XAI":
             
             # 4. Career & Company Matcher
             with st.container(border=True):
-                st.markdown("### 💼 Intelligent Career & Company Matcher")
+                st.markdown("### Intelligent Career & Company Matcher")
                 
                 col_c1, col_c2 = st.columns([4, 5])
                 with col_c1:
@@ -1108,7 +1108,7 @@ elif routing_selection == "🔮 Predict Placement & XAI":
                     # Group by fit level
                     for comp in company_recommendations[:5]:
                         fit_color = "green" if comp['fit'] == "Strong Match" else "orange" if comp['fit'] == "Moderate Match" else "red"
-                        st.markdown(f"💼 **{comp['company']}** ({comp['tier']}) - <span style='color:{fit_color}; font-weight:bold;'>{comp['fit']} ({comp['score']:.1f}%)</span>", unsafe_allow_html=True)
+                        st.markdown(f"**{comp['company']}** ({comp['tier']}) - <span style='color:{fit_color}; font-weight:bold;'>{comp['fit']} ({comp['score']:.1f}%)</span>", unsafe_allow_html=True)
                         st.write(f"*Hiring Suitability:* {comp['reasons']}")
                         st.caption(f"*Advisory:* {comp['advice']}")
                         st.write("")
@@ -1116,11 +1116,11 @@ elif routing_selection == "🔮 Predict Placement & XAI":
 # ==========================================
 # MODULE 6 & 7 & 10: Skill Gap & Career Roadmap
 # ==========================================
-elif routing_selection == "🎯 Skill Gap & Career Roadmap":
-    st.title("🎯 Competency Skill Gap & Learning Roadmap")
+elif routing_selection == "Skill Gap & Career Roadmap":
+    st.title("Competency Skill Gap & Learning Roadmap")
     
     if 'active_student_profile' not in st.session_state:
-        st.warning("Please input student profile metrics in the **Predict Placement & XAI** tab first to generate your custom learning path.")
+        st.warning("Please input student profile metrics in the **Predict Placement** tab first to generate your custom learning path.")
     else:
         profile = st.session_state.active_student_profile
         results = st.session_state.active_student_results
@@ -1147,7 +1147,7 @@ elif routing_selection == "🎯 Skill Gap & Career Roadmap":
         
         # 1. Competency Gap Assessment Card
         with st.container(border=True):
-            st.markdown(f"### 📊 Profile vs. Industry Benchmarks")
+            st.markdown(f"### Profile vs. Industry Benchmarks")
             
             col_gap1, col_gap2 = st.columns([1.1, 1.0])
             with col_gap1:
@@ -1155,14 +1155,14 @@ elif routing_selection == "🎯 Skill Gap & Career Roadmap":
                 p_color = "red" if gap_results['priority_level'] == "High" else "orange" if gap_results['priority_level'] == "Medium" else "green"
                 st.markdown(f"**Action Priority Level:** <span style='color:{p_color}; font-weight:bold;'>{gap_results['priority_level']}</span>", unsafe_allow_html=True)
                 
-                st.markdown("##### ✅ Existing Skill Strengths")
+                st.markdown("##### Existing Skill Strengths")
                 if gap_results['existing_skills']:
                     for skill in gap_results['existing_skills']:
                         st.write(f"- {skill}")
                 else:
                     st.write("- No matching strengths identified.")
                     
-                st.markdown("##### 🚨 Identified Missing Competencies")
+                st.markdown("##### Identified Missing Competencies")
                 for skill in gap_results['missing_skills']:
                     st.write(f"- {skill}")
                     
@@ -1230,14 +1230,14 @@ elif routing_selection == "🎯 Skill Gap & Career Roadmap":
 
         # 2. Probability Boost Card
         with st.container(border=True):
-            st.markdown("### 🚀 Placement Boost Forecast & Recommended Credentials")
+            st.markdown("### Placement Boost Forecast & Recommended Credentials")
             
             boost_col1, boost_col2 = st.columns([1, 1.2])
             with boost_col1:
                 st.markdown(f"By closing these skill gaps, the student can increase their placement probability by:")
                 st.markdown(f"<h1 style='color:#059669; font-size:48px; margin: 0;'>+{gap_results['estimated_probability_gain']}%</h1>", unsafe_allow_html=True)
             with boost_col2:
-                st.markdown("##### 📜 Recommended Skill Certifications")
+                st.markdown("##### Recommended Skill Certifications")
                 for cert in gap_results['recommended_certifications']:
                     st.markdown(f"- **{cert['name']}** (Improves probability by **+{cert['prob_gain']}%**)")
                     
@@ -1245,24 +1245,24 @@ elif routing_selection == "🎯 Skill Gap & Career Roadmap":
         
         # Personalized 12-Week Roadmap
         with st.container(border=True):
-            st.markdown("### 📅 Tailored 12-Week Placement Action Plan")
+            st.markdown("### Tailored 12-Week Placement Action Plan")
             st.markdown("This week-by-week timeline covers core study topics, programming practices, and interview mock preparations tailored to the student's weaknesses.")
             
             roadmap_timeline = generate_roadmap(profile, target_role)
             
             for index, block in enumerate(roadmap_timeline):
-                with st.expander(f"📌 {block['weeks']}: {block['topic']}", expanded=(index == 0)):
+                with st.expander(f"{block['weeks']}: {block['topic']}", expanded=(index == 0)):
                     st.markdown(f"*{block['description']}*")
                     st.write("**Weekly Tasks Checklist:**")
                     for action in block['action_items']:
                         st.checkbox(action, value=False, key=f"action_{index}_{action[:20]}")
-                    st.info(f"📚 **Recommended Resources:** {block['resources']}")
+                    st.info(f"**Recommended Resources:** {block['resources']}")
 
 # ==========================================
 # MODULE 9: Resume ATS Scorer
 # ==========================================
-elif routing_selection == "📝 Resume ATS Scorer":
-    st.title("📝 ATS Resume Analyzer & Scorer")
+elif routing_selection == "Resume ATS Scorer":
+    st.title("ATS Resume Analyzer & Scorer")
     st.markdown("Upload a PDF resume to parse contents, scan for core keywords matching the target role, and calculate an ATS score.")
     
     col_res1, col_res2 = st.columns([1, 1])
@@ -1278,7 +1278,7 @@ elif routing_selection == "📝 Resume ATS Scorer":
                 options=["Software Engineer", "Data Scientist", "Machine Learning Engineer", "Data Analyst", "Business Analyst", "AI Engineer", "Full Stack Developer"]
             )
             
-            analyze_button = st.button("📝 Analyze Resume ATS Score", use_container_width=True, disabled=(uploaded_file is None))
+            analyze_button = st.button("Analyze Resume ATS Score", use_container_width=True, disabled=(uploaded_file is None))
             
             if uploaded_file is not None and analyze_button:
                 with st.spinner("Extracting PDF text and matching keywords..."):
@@ -1336,34 +1336,34 @@ elif routing_selection == "📝 Resume ATS Scorer":
                 # Detailed stats
                 st.write(f"**Word Count:** {resume_analysis['word_count']} words")
                 
-                st.markdown("##### 🛠️ Skills Found in Resume")
+                st.markdown("##### Skills Found in Resume")
                 if resume_analysis['skills_found']:
                     st.write(", ".join(resume_analysis['skills_found']))
                 else:
                     st.write("*No technical skills found in resume text.*")
                     
-                st.markdown("##### ❌ Missing Keywords for Target Track")
+                st.markdown("##### Missing Keywords for Target Track")
                 if resume_analysis['missing_keywords']:
                     st.write(", ".join(resume_analysis['missing_keywords']))
                 else:
                     st.write("*No missing keywords! Perfect match.*")
                     
-                st.markdown("##### 💡 ATS Improvement Suggestions")
+                st.markdown("##### ATS Improvement Suggestions")
                 for sug in resume_analysis['suggestions']:
                     st.markdown(f"- {sug}")
 
 # ==========================================
 # MODULE 12: Model Benchmarking
 # ==========================================
-elif routing_selection == "📊 Model Benchmarking":
-    st.title("📊 Machine Learning Models Benchmarking & Comparison")
+elif routing_selection == "Model Benchmarking":
+    st.title("Machine Learning Models Benchmarking & Comparison")
     st.markdown("Train, evaluate, and benchmark multiple ML classifiers. Auto-select the best model based on F1-Score metrics.")
     
     # Check if model_metrics.json exists
     metrics_path = "models/model_metrics.json"
     if not os.path.exists(metrics_path):
         st.warning("No pre-trained model metadata found. Click the button below to train models using the enriched student dataset.")
-        train_button = st.button("🏋️ Train Model Suite (Logistic Regression, Trees, Ensemble, XGBoost)", use_container_width=True)
+        train_button = st.button("Train Model Suite (Logistic Regression, Trees, Ensemble, XGBoost)", use_container_width=True)
         if train_button:
             with st.spinner("Executing Grid Search & model training..."):
                 from src.model_training import train_and_evaluate_models
@@ -1378,7 +1378,7 @@ elif routing_selection == "📊 Model Benchmarking":
         with open(metrics_path, "r") as f:
             all_metrics = json.load(f)
             
-        st.success(f"🤖 **Auto-selected Best Classifier:** `{all_metrics.get('best_model', 'N/A')}`")
+        st.success(f"**Auto-selected Best Classifier:** `{all_metrics.get('best_model', 'N/A')}`")
         
         # 1. Comparison Table
         table_rows = []
@@ -1449,8 +1449,8 @@ elif routing_selection == "📊 Model Benchmarking":
 # ==========================================
 # MODULE 11: AI Interview Coach
 # ==========================================
-elif routing_selection == "🤖 AI Interview Coach":
-    st.title("🤖 AI Interview Coach & Feedback Engine")
+elif routing_selection == "AI Interview Coach":
+    st.title("AI Interview Coach & Feedback Engine")
     st.markdown("Practice mock interview questions tailored to your career track and receive instant conceptual evaluations, matching analysis, and coaching guidelines.")
     
     from src.interview_coach import generate_ai_question, evaluate_ai_answer
@@ -1487,7 +1487,7 @@ elif routing_selection == "🤖 AI Interview Coach":
             del st.session_state.active_ai_review
     
     # Next Question/Start Interview button
-    btn_label = "⏭️ Start Live Interview" if st.session_state.ai_interview_q_meta is None else "⏭️ Load Next Unique Question"
+    btn_label = "Start Live Interview" if st.session_state.ai_interview_q_meta is None else "Load Next Unique Question"
     if st.button(btn_label, use_container_width=True):
         with st.spinner("Generating a unique question from Gemini AI..."):
             q_meta = generate_ai_question(selected_track, st.session_state.ai_previous_questions)
@@ -1501,11 +1501,11 @@ elif routing_selection == "🤖 AI Interview Coach":
                 st.rerun()
                 
     if st.session_state.ai_interview_q_meta is None:
-        st.info("💡 Click the button above to dynamically load an interview question from Gemini AI.")
+        st.info("Click the button above to dynamically load an interview question from Gemini AI.")
     else:
         q_meta = st.session_state.ai_interview_q_meta
         
-        st.info(f"🎙️ **Interview Question:** \n\n {q_meta['question']}")
+        st.info(f"**Interview Question:** \n\n {q_meta['question']}")
         
         st.write("")
         
@@ -1516,7 +1516,7 @@ elif routing_selection == "🤖 AI Interview Coach":
             key=f"ai_ans_{selected_track}_{len(st.session_state.ai_previous_questions)}"
         )
         
-        submit_btn = st.button("📝 Submit Answer for AI Review", use_container_width=True, type="primary")
+        submit_btn = st.button("Submit Answer for AI Review", use_container_width=True, type="primary")
         
         if submit_btn:
             if not user_ans.strip():
@@ -1546,13 +1546,13 @@ elif routing_selection == "🤖 AI Interview Coach":
             score = review['score']
             
             st.write("---")
-            st.markdown("### 📋 AI Assessment & Coaching Feedback")
+            st.markdown("### AI Assessment & Coaching Feedback")
             
             col_res1, col_res2 = st.columns([1, 1.2])
             
             with col_res1:
                 with st.container(border=True):
-                    st.markdown("##### 🎯 Semantic Coverage Score")
+                    st.markdown("##### Semantic Coverage Score")
                     
                     fig_score = go.Figure(go.Indicator(
                         mode = "gauge+number",
@@ -1579,7 +1579,7 @@ elif routing_selection == "🤖 AI Interview Coach":
                     
             with col_res2:
                 with st.container(border=True):
-                    st.markdown("##### 🛠️ Concepts Match Assessment")
+                    st.markdown("##### Concepts Match Assessment")
                     
                     st.write("**Identified Strengths / Covered Concepts:**")
                     if review['matched_concepts']:
@@ -1594,14 +1594,14 @@ elif routing_selection == "🤖 AI Interview Coach":
                         tags_missing_html = " ".join([f"<span style='background-color:rgba(239, 68, 68, 0.15); color:#EF4444; border:1px solid rgba(239,68,68,0.3); padding:4px 10px; border-radius:12px; margin-right:6px; font-size:12px; font-weight:500; display:inline-block;'>{tag}</span>" for tag in review['missing_concepts']])
                         st.markdown(tags_missing_html, unsafe_allow_html=True)
                     else:
-                        st.write("🎉 *None! You covered all expected concepts.*")
+                        st.write("*None! You covered all expected concepts.*")
                         
             with st.container(border=True):
-                st.markdown("##### 📋 Actionable Coaching Guidelines")
+                st.markdown("##### Actionable Coaching Guidelines")
                 for tip in review['guidelines']:
                     st.write(tip)
                     
-            with st.expander("📚 Study Model Response & Explanation"):
+            with st.expander("Study Model Response & Explanation"):
                 st.write("**Ideal Answer Structure:**")
                 st.info(q_meta['ideal_response'])
                 st.write("**Preparation Advice:**")
@@ -1610,11 +1610,11 @@ elif routing_selection == "🤖 AI Interview Coach":
 # ==========================================
 # MODULE 14: History & Data Management
 # ==========================================
-elif routing_selection == "💾 History & Data Management":
-    st.title("💾 History & Data Management")
+elif routing_selection == "History & Data Management":
+    st.title("History & Data Management")
     st.markdown("Upload new custom CSV datasets for preprocessing/validation, query past predictions from SQLite, or export history records.")
     
-    tab1, tab2 = st.tabs(["📂 Upload & Validate Dataset", "📋 SQLite Prediction History"])
+    tab1, tab2 = st.tabs(["Upload & Validate Dataset", "SQLite Prediction History"])
     
     with tab1:
         with st.container(border=True):
@@ -1632,9 +1632,9 @@ elif routing_selection == "💾 History & Data Management":
                 is_valid, report, cleaned_df = validate_csv_data(raw_upload)
                 
                 if not is_valid:
-                    st.error(f"❌ Validation failed: {report}")
+                    st.error(f"Validation failed: {report}")
                 else:
-                    st.success("✅ CSV Schema Check Passed!")
+                    st.success("CSV Schema Check Passed!")
                     st.info(report)
                     
                     st.write("---")
@@ -1650,7 +1650,7 @@ elif routing_selection == "💾 History & Data Management":
             st.subheader("SQLite Saved Prediction History")
             
             # Search query
-            search_query = st.text_input("🔍 Search Student Name or Department", value="")
+            search_query = st.text_input("Search Student Name or Department", value="")
             
             if search_query:
                 df_history = search_history(search_query)
@@ -1668,7 +1668,7 @@ elif routing_selection == "💾 History & Data Management":
                     csv_buffer = io.StringIO()
                     df_history.to_csv(csv_buffer, index=False)
                     st.download_button(
-                        label="📥 Export History to CSV",
+                        label="Export History to CSV",
                         data=csv_buffer.getvalue(),
                         file_name="Student_Placement_History.csv",
                         mime="text/csv",
@@ -1677,7 +1677,7 @@ elif routing_selection == "💾 History & Data Management":
                     
                 with h_col2:
                     # Clear Database
-                    if st.button("🗑️ Clear Entire History Database", use_container_width=True, type="secondary"):
+                    if st.button("Clear Entire History Database", use_container_width=True, type="secondary"):
                         clear_history()
                         st.success("Prediction database history wiped successfully!")
                         st.rerun()
