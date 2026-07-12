@@ -1516,7 +1516,7 @@ elif routing_selection == "AI Interview Coach":
     # Next Question/Start Interview button
     btn_label = "Start Live Interview" if st.session_state.ai_interview_q_meta is None else "Load Next Unique Question"
     if st.button(btn_label, use_container_width=True):
-        with st.spinner("Generating a unique question from Gemini AI..."):
+        with st.spinner("Generating a unique question..."):
             q_meta = generate_ai_question(selected_track, st.session_state.ai_previous_questions)
             if 'error' in q_meta:
                 st.error(q_meta['error'])
@@ -1528,7 +1528,7 @@ elif routing_selection == "AI Interview Coach":
                 st.rerun()
                 
     if st.session_state.ai_interview_q_meta is None:
-        st.info("Click the button above to dynamically load an interview question from Gemini AI.")
+        st.info("Click the button above to dynamically load an interview question.")
     else:
         q_meta = st.session_state.ai_interview_q_meta
         
@@ -1549,7 +1549,7 @@ elif routing_selection == "AI Interview Coach":
             if not user_ans.strip():
                 st.warning("Please type a response before submitting.")
             else:
-                with st.spinner("Gemini is evaluating your answer semantically..."):
+                with st.spinner("Evaluating your answer semantically..."):
                     review = evaluate_ai_answer(
                         selected_track,
                         q_meta['question'],

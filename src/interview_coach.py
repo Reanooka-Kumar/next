@@ -30,7 +30,7 @@ def generate_ai_question(role, previous_questions=None, api_key=None):
         
     if not get_gemini_client(api_key):
         return {
-            'error': "Gemini API key is not configured. Please input your API key in the sidebar."
+            'error': "AI API key is not configured. Please check your environment configurations."
         }
         
     previous_qs_filter = ""
@@ -74,7 +74,7 @@ Do not include any code block syntax markers (like ```json), markdown formatting
         return data
     except Exception as e:
         return {
-            'error': f"Gemini API Question Generation Failed: {str(e)}"
+            'error': f"AI Question Generation Failed: {str(e)}"
         }
 
 def evaluate_ai_answer(role, question, expected_concepts, user_answer, api_key=None):
@@ -84,7 +84,7 @@ def evaluate_ai_answer(role, question, expected_concepts, user_answer, api_key=N
     """
     if not get_gemini_client(api_key):
         return {
-            'error': "Gemini API key is not configured. Please input your API key in the sidebar."
+            'error': "AI API key is not configured. Please check your environment configurations."
         }
         
     concepts_str = ", ".join(expected_concepts)
@@ -140,5 +140,5 @@ Do not include any code block syntax markers (like ```json), markdown formatting
         return data
     except Exception as e:
         return {
-            'error': f"Gemini API Response Evaluation Failed: {str(e)}"
+            'error': f"AI Response Evaluation Failed: {str(e)}"
         }
