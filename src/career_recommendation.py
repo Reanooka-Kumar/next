@@ -153,11 +153,20 @@ def _recommend_careers_fallback(student_profile):
         se_score += 5
     se_score = min(100.0, max(30.0, se_score))
     
-    se_reasons = [
-        f"Your coding score of {coding:.1f}/100 shows a strong foundation for software development.",
-        f"You have completed {projects} projects, showing practical implementation experience.",
-        "Your programming language profile matches core industry standards for application logic."
-    ]
+    se_reasons = []
+    if coding >= 75:
+        se_reasons.append(f"Your coding score of {coding:.1f}/100 shows a strong foundation for software development.")
+    elif coding >= 50:
+        se_reasons.append(f"Your coding score of {coding:.1f}/100 shows a moderate programming foundation. Daily practice is recommended.")
+    else:
+        se_reasons.append(f"Your coding score of {coding:.1f}/100 is low. Focus on coding challenges to build core logic.")
+        
+    if projects >= 2:
+        se_reasons.append(f"You have completed {projects} projects, showing practical implementation experience.")
+    else:
+        se_reasons.append(f"You have {projects} project(s) completed; targeting at least 2 full-stack projects will boost your profile.")
+        
+    se_reasons.append("Your programming language profile matches core industry standards for application logic.")
     if "java" in languages or "c++" in languages:
         se_reasons.append("Proficiency in object-oriented programming (Java/C++) is highly preferred by core software companies.")
         
@@ -176,11 +185,22 @@ def _recommend_careers_fallback(student_profile):
         ds_score += 5
     ds_score = min(100.0, max(30.0, ds_score))
     
-    ds_reasons = [
-        f"Your CGPA of {cgpa:.2f} satisfies the rigorous academic requirements for data science roles.",
-        f"Your aptitude score ({aptitude:.1f}/100) indicates strong analytical and statistical reasoning skills.",
-        "Python and SQL are in your profile, which are the primary tools used for data manipulation and modeling."
-    ]
+    ds_reasons = []
+    if cgpa >= 8.0:
+        ds_reasons.append(f"Your CGPA of {cgpa:.2f} satisfies the rigorous academic requirements for data science roles.")
+    elif cgpa >= 7.0:
+        ds_reasons.append(f"Your CGPA of {cgpa:.2f} meets baseline academic standards, but higher scores will help you stand out.")
+    else:
+        ds_reasons.append(f"Your CGPA of {cgpa:.2f} is currently below the typical benchmark. Focus on boosting academic scores.")
+        
+    if aptitude >= 75:
+        ds_reasons.append(f"Your aptitude score ({aptitude:.1f}/100) indicates strong analytical and statistical reasoning skills.")
+    elif aptitude >= 50:
+        ds_reasons.append(f"Your aptitude score ({aptitude:.1f}/100) is average. Focus on improving logical reasoning speed.")
+    else:
+        ds_reasons.append(f"Your aptitude score ({aptitude:.1f}/100) requires significant attention to meet data science requirements.")
+        
+    ds_reasons.append("Python and SQL are in your profile, which are the primary tools used for data manipulation and modeling.")
     if projects >= 2:
         ds_reasons.append("Your multiple projects show capability in independent problem-solving and model design.")
         
@@ -199,11 +219,22 @@ def _recommend_careers_fallback(student_profile):
         mle_score += 5
     mle_score = min(100.0, max(30.0, mle_score))
     
-    mle_reasons = [
-        f"Your technical interview score of {tech_interview:.1f}/100 demonstrates solid algorithmic competency.",
-        f"Your coding score ({coding:.1f}) is well-suited for writing optimized model architectures.",
-        "Your project history demonstrates hands-on implementation, a core requirement for ML engineering positions."
-    ]
+    mle_reasons = []
+    if tech_interview >= 75:
+        mle_reasons.append(f"Your technical interview score of {tech_interview:.1f}/100 demonstrates solid algorithmic competency.")
+    elif tech_interview >= 50:
+        mle_reasons.append(f"Your technical interview score ({tech_interview:.1f}/100) shows basic algorithmic knowledge with room for growth.")
+    else:
+        mle_reasons.append(f"Your technical interview score ({tech_interview:.1f}/100) indicates gaps in algorithmic reasoning.")
+        
+    if coding >= 75:
+        mle_reasons.append(f"Your coding score ({coding:.1f}/100) is well-suited for writing optimized model architectures.")
+    elif coding >= 50:
+        mle_reasons.append(f"Your coding score ({coding:.1f}/100) is moderate. Target optimized algorithm implementations.")
+    else:
+        mle_reasons.append(f"Your coding score ({coding:.1f}/100) is currently below baseline. Dedicate time to master basic algorithms.")
+        
+    mle_reasons.append("Your project history demonstrates hands-on implementation, a core requirement for ML engineering positions.")
     if "python" in languages:
         mle_reasons.append("Python proficiency allows you to easily work with standard frameworks like TensorFlow/PyTorch.")
         
@@ -222,11 +253,22 @@ def _recommend_careers_fallback(student_profile):
         da_score += 5
     da_score = min(100.0, max(30.0, da_score))
     
-    da_reasons = [
-        f"Your aptitude score of {aptitude:.1f}/100 shows a strong capacity for pattern recognition and quantitative analysis.",
-        f"Your communication score of {comm:.1f}/100 indicates you can effectively translate technical insights to stakeholders.",
-        "Your profile lists databases / SQL, which is standard for querying business databases."
-    ]
+    da_reasons = []
+    if aptitude >= 75:
+        da_reasons.append(f"Your aptitude score of {aptitude:.1f}/100 shows a strong capacity for pattern recognition and quantitative analysis.")
+    elif aptitude >= 50:
+        da_reasons.append(f"Your aptitude score of {aptitude:.1f}/100 shows moderate logical capacity. Enhance your data analysis logic.")
+    else:
+        da_reasons.append(f"Your aptitude score of {aptitude:.1f}/100 requires work to build strong quantitative reasoning skills.")
+        
+    if comm >= 70:
+        da_reasons.append(f"Your communication score of {comm:.1f}/100 indicates you can effectively translate technical insights to stakeholders.")
+    elif comm >= 50:
+        da_reasons.append(f"Your communication score ({comm:.1f}/100) shows baseline skills, but stakeholders require polished presentations.")
+    else:
+        da_reasons.append(f"Your communication score ({comm:.1f}/100) is low. Focus on technical presentation and speaking.")
+        
+    da_reasons.append("Your profile lists databases / SQL, which is standard for querying business databases.")
     
     recommendations.append({
         'role': 'Data Analyst',
@@ -241,11 +283,20 @@ def _recommend_careers_fallback(student_profile):
         ba_score += 6
     ba_score = min(100.0, max(30.0, ba_score))
     
-    ba_reasons = [
-        f"Your communication rating of {comm:.1f}/100 is excellent for business requirements gathering and presentations.",
-        f"Strong aptitude performance ({aptitude:.1f}) shows you are adept at logic modeling and process formulation.",
-        "Your hybrid technical and interpersonal skill-mix fits the intermediary role between engineering and management."
-    ]
+    ba_reasons = []
+    if comm >= 75:
+        ba_reasons.append(f"Your communication rating of {comm:.1f}/100 is excellent for business requirements gathering and presentations.")
+    elif comm >= 55:
+        ba_reasons.append(f"Your communication rating of {comm:.1f}/100 is moderate. Practice requirements gathering sessions.")
+    else:
+        ba_reasons.append(f"Your communication rating ({comm:.1f}/100) needs significant work as it is critical for business analyst roles.")
+        
+    if aptitude >= 75:
+        ba_reasons.append(f"Strong aptitude performance ({aptitude:.1f}) shows you are adept at logic modeling and process formulation.")
+    else:
+        ba_reasons.append(f"Aptitude score ({aptitude:.1f}) indicates you should focus on quantitative and logical mapping principles.")
+        
+    ba_reasons.append("Your hybrid technical and interpersonal skill-mix fits the intermediary role between engineering and management.")
     
     recommendations.append({
         'role': 'Business Analyst',
@@ -262,11 +313,16 @@ def _recommend_careers_fallback(student_profile):
         ai_score += 5
     ai_score = min(100.0, max(30.0, ai_score))
     
-    ai_reasons = [
-        f"Highly competitive coding and interview score profile matches the requirements of AI R&D labs.",
-        f"Your background includes {projects} projects, indicating exposure to implementing pipelines.",
-        "Proficiency in languages like Python matches modern generative AI and API deployment frameworks."
-    ]
+    ai_reasons = []
+    if coding >= 75 and tech_interview >= 75:
+        ai_reasons.append("Highly competitive coding and interview score profile matches the requirements of AI R&D labs.")
+    elif coding >= 50 and tech_interview >= 50:
+        ai_reasons.append("Your coding and interview scores are moderate; strengthen advanced concepts for AI roles.")
+    else:
+        ai_reasons.append("AI engineering roles require stronger coding and algorithmic interview foundations. Focus on core preparation.")
+        
+    ai_reasons.append(f"Your background includes {projects} projects, indicating exposure to implementing pipelines.")
+    ai_reasons.append("Proficiency in languages like Python matches modern generative AI and API deployment frameworks.")
     
     recommendations.append({
         'role': 'AI Engineer',
@@ -283,10 +339,13 @@ def _recommend_careers_fallback(student_profile):
         fs_score += 5
     fs_score = min(100.0, max(30.0, fs_score))
     
-    fs_reasons = [
-        f"Coding score of {coding:.1f}/100 is solid for full-stack system architecture development.",
-        f"Your portfolio contains {projects} projects, showing experience building applications.",
-    ]
+    fs_reasons = []
+    if coding >= 75:
+        fs_reasons.append(f"Coding score of {coding:.1f}/100 is solid for full-stack system architecture development.")
+    else:
+        fs_reasons.append(f"Coding score of {coding:.1f}/100 needs to be improved to support building complex web architectures.")
+        
+    fs_reasons.append(f"Your portfolio contains {projects} projects, showing experience building applications.")
     if "javascript" in languages:
         fs_reasons.append("Your familiarity with JavaScript is essential for frontend frameworks (React, Angular) and backend runtime (Node.js).")
     else:
