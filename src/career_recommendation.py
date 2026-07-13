@@ -21,7 +21,7 @@ def _generate_content_with_fallback(prompt):
     if not api_key:
         raise ValueError("No GEMINI_API_KEY found in environment.")
         
-    genai.configure(api_key=api_key.strip())
+    genai.configure(api_key=api_key.strip(), transport='rest')
     
     # List of models to try in order of preference
     models_to_try = ['gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest']
