@@ -30,10 +30,14 @@ def _generate_content_with_fallback(prompt):
     for model_name in models_to_try:
         try:
             model = genai.GenerativeModel(model_name)
-            response = model.generate_content(prompt)
+            response = model.generate_content(prompt, request_options={"timeout": 5.0})
             return response.text.strip()
         except Exception as e:
             last_error = e
+            # If it's a network timeout, connection error, or DNS issue, abort early to avoid long hangs
+            err_msg = str(e).lower()
+            if any(term in err_msg for term in ["timeout", "timed out", "connect", "unreachable", "resolution"]):
+                break
             continue
             
     raise last_error if last_error else RuntimeError("Failed to generate content with all available models.")
