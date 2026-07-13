@@ -1,11 +1,134 @@
+import os
+import json
 import pandas as pd
 import numpy as np
+import google.generativeai as genai
+from dotenv import load_dotenv
+import streamlit as st
 
+def conditional_cache(func):
+    """
+    Decorator that applies st.cache_data if streamlit runtime is active.
+    Otherwise, returns the function untouched to avoid warnings/side-effects.
+    """
+    if st.runtime.exists():
+        return st.cache_data(func)
+    return func
+
+def _generate_content_with_fallback(prompt):
+    load_dotenv()
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("No GEMINI_API_KEY found in environment.")
+        
+    genai.configure(api_key=api_key.strip())
+    
+    # List of models to try in order of preference
+    models_to_try = ['gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest']
+    
+    last_error = None
+    for model_name in models_to_try:
+        try:
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(prompt)
+            return response.text.strip()
+        except Exception as e:
+            last_error = e
+            continue
+            
+    raise last_error if last_error else RuntimeError("Failed to generate content with all available models.")
+
+def _parse_json_response(text):
+    text = text.strip()
+    if text.startswith("```"):
+        lines = text.split("\n")
+        if lines[0].startswith("```json") or lines[0].startswith("```"):
+            lines = lines[1:-1]
+        text = "\n".join(lines).strip()
+    return json.loads(text)
+
+@conditional_cache
 def recommend_careers(student_profile):
     """
     Computes a match percentage and specific feedback for 7 career paths.
-    student_profile: dict containing student raw inputs
+    Uses Gemini API if available, falling back to local heuristic logic on failure.
     """
+    cgpa = student_profile.get('cgpa', 7.0)
+    coding = student_profile.get('coding', 50.0)
+    aptitude = student_profile.get('aptitude', 50.0)
+    comm = student_profile.get('communication', 50.0)
+    tech_interview = student_profile.get('technical_interview', 50.0)
+    projects = student_profile.get('projects', 1)
+    certifications = student_profile.get('certifications', 1)
+    languages = str(student_profile.get('languages', ''))
+    
+    prompt = f"""
+You are an expert career advisory AI.
+Analyze the following student profile metrics and evaluate their compatibility across these 7 career paths:
+- Software Engineer
+- Data Scientist
+- Machine Learning Engineer
+- Data Analyst
+- Business Analyst
+- AI Engineer
+- Full Stack Developer
+
+Student Profile:
+- CGPA: {cgpa:.2f}/10.0
+- Coding Competency: {coding:.1f}/100
+- Aptitude Score: {aptitude:.1f}/100
+- Communication: {comm:.1f}/100
+- Technical Interview: {tech_interview:.1f}/100
+- Number of Projects: {projects}
+- Number of Certifications: {certifications}
+- Known Programming Languages / Technologies: {languages}
+
+For each of the 7 roles, calculate a compatibility match score (0.0 to 100.0 as a float), determine a fit level ("Excellent Fit" if score >= 80, "Good Fit" if score >= 60 else "Aspirational"), and generate 3 to 4 personalized, specific bullet points explaining "Why this role?" based on their metrics and language profile. Keep explanation bullets clear, positive, and constructive.
+
+Respond STRICTLY in JSON format matching the schema below:
+[
+  {{
+    "role": "Role Name",
+    "score": 85.5,
+    "fit": "Excellent Fit",
+    "reasons": [
+      "Reason bullet 1 detailing why coding score or projects match.",
+      "Reason bullet 2 mentioning language matches.",
+      "Reason bullet 3 showing growth areas or alignment."
+    ]
+  }},
+  ...
+]
+
+Do not include any code block syntax markers (like ```json), markdown formatting, or trailing text. Return only the raw JSON string.
+"""
+    try:
+        response_text = _generate_content_with_fallback(prompt)
+        recommendations = _parse_json_response(response_text)
+        
+        # Validate keys and shape of recommendations
+        validated_recs = []
+        for item in recommendations:
+            if all(k in item for k in ('role', 'score', 'fit', 'reasons')):
+                # Ensure correct types
+                item['score'] = float(item['score'])
+                if not isinstance(item['reasons'], list):
+                    item['reasons'] = [str(item['reasons'])]
+                validated_recs.append(item)
+                
+        if len(validated_recs) == 7:
+            # Sort by score descending
+            validated_recs = sorted(validated_recs, key=lambda x: x['score'], reverse=True)
+            return validated_recs
+        else:
+            raise ValueError("Invalid number of roles returned from LLM")
+            
+    except Exception as e:
+        # Fallback to local heuristic logic on any failure
+        print(f"[RECS] Career recommendation API failed: {e}. Falling back to heuristic.")
+        return _recommend_careers_fallback(student_profile)
+
+def _recommend_careers_fallback(student_profile):
     cgpa = student_profile.get('cgpa', 7.0)
     coding = student_profile.get('coding', 50.0)
     aptitude = student_profile.get('aptitude', 50.0)

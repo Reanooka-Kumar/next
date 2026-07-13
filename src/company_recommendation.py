@@ -1,11 +1,136 @@
+import os
+import json
 import pandas as pd
 import numpy as np
+import google.generativeai as genai
+from dotenv import load_dotenv
+import streamlit as st
 
+def conditional_cache(func):
+    """
+    Decorator that applies st.cache_data if streamlit runtime is active.
+    Otherwise, returns the function untouched to avoid warnings/side-effects.
+    """
+    if st.runtime.exists():
+        return st.cache_data(func)
+    return func
+
+def _generate_content_with_fallback(prompt):
+    load_dotenv()
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        raise ValueError("No GEMINI_API_KEY found in environment.")
+        
+    genai.configure(api_key=api_key.strip())
+    
+    # List of models to try in order of preference
+    models_to_try = ['gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest']
+    
+    last_error = None
+    for model_name in models_to_try:
+        try:
+            model = genai.GenerativeModel(model_name)
+            response = model.generate_content(prompt)
+            return response.text.strip()
+        except Exception as e:
+            last_error = e
+            continue
+            
+    raise last_error if last_error else RuntimeError("Failed to generate content with all available models.")
+
+def _parse_json_response(text):
+    text = text.strip()
+    if text.startswith("```"):
+        lines = text.split("\n")
+        if lines[0].startswith("```json") or lines[0].startswith("```"):
+            lines = lines[1:-1]
+        text = "\n".join(lines).strip()
+    return json.loads(text)
+
+@conditional_cache
 def recommend_companies(student_profile):
     """
     Evaluates student profile suitability across 11 target employers.
-    Categorizes them by Tier and provides tailored insights.
+    Uses Gemini API if available, falling back to local heuristic logic on failure.
     """
+    cgpa = student_profile.get('cgpa', 7.0)
+    coding = student_profile.get('coding', 50.0)
+    aptitude = student_profile.get('aptitude', 50.0)
+    comm = student_profile.get('communication', 50.0)
+    tech_interview = student_profile.get('technical_interview', 50.0)
+    projects = student_profile.get('projects', 1)
+    internships = student_profile.get('internships', 0)
+    certifications = student_profile.get('certifications', 1)
+    languages = str(student_profile.get('languages', ''))
+    
+    prompt = f"""
+You are an expert corporate recruitment advisor AI.
+Analyze the following student profile metrics and evaluate their suitability fit across these 11 employers:
+- Google (Tier 1 (Product Giant))
+- Microsoft (Tier 1 (Product Giant))
+- Amazon (Tier 1 (Product Giant))
+- Zoho (Tier 2 (Core Product))
+- IBM (Tier 2 (Global Technology))
+- Accenture (Tier 3 (IT Consulting))
+- Cognizant (Tier 3 (IT Services))
+- Capgemini (Tier 3 (IT Services))
+- TCS (Tier 3 (IT Services))
+- Infosys (Tier 3 (IT Services))
+- Wipro (Tier 3 (IT Services))
+
+Student Profile:
+- CGPA: {cgpa:.2f}/10.0
+- Coding Competency: {coding:.1f}/100
+- Aptitude Score: {aptitude:.1f}/100
+- Communication: {comm:.1f}/100
+- Technical Interview: {tech_interview:.1f}/100
+- Number of Projects: {projects}
+- Number of Internships: {internships}
+- Number of Certifications: {certifications}
+- Known Programming Languages / Technologies: {languages}
+
+For each of the 11 employers, calculate a suitability score (0.0 to 100.0 as a float), determine a fit level ("Strong Match", "Moderate Match", or "Aspirational"), write a tailored "Hiring Suitability" explanation, and provide specific, actionable "Advisory" preparation advice for that company.
+
+Respond STRICTLY in JSON format matching the schema below:
+[
+  {{
+    "company": "Company Name",
+    "tier": "Tier 1 (Product Giant) / Tier 2 (Core Product) / Tier 3 (IT Services) / Tier 3 (IT Consulting)",
+    "score": 88.5,
+    "fit": "Strong Match",
+    "reasons": "Detailed explanation of suitability based on their profile. E.g., 'Requires high coding capability (min. 80) and strong technical communication. Your current profile scores are...'",
+    "advice": "Actionable prep advice. E.g., 'Focus on advanced Data Structures & Algorithms, System Design basics, and explaining your projects in detail.'"
+  }},
+  ...
+]
+
+Do not include any code block syntax markers (like ```json), markdown formatting, or trailing text. Return only the raw JSON string.
+"""
+    try:
+        response_text = _generate_content_with_fallback(prompt)
+        recommendations = _parse_json_response(response_text)
+        
+        # Validate keys and shape of recommendations
+        validated_recs = []
+        for item in recommendations:
+            if all(k in item for k in ('company', 'tier', 'score', 'fit', 'reasons', 'advice')):
+                # Ensure correct types
+                item['score'] = float(item['score'])
+                validated_recs.append(item)
+                
+        if len(validated_recs) == 11:
+            # Sort by score descending
+            validated_recs = sorted(validated_recs, key=lambda x: x['score'], reverse=True)
+            return validated_recs
+        else:
+            raise ValueError("Invalid number of companies returned from LLM")
+            
+    except Exception as e:
+        # Fallback to local heuristic logic on any failure
+        print(f"[RECS] Company recommendation API failed: {e}. Falling back to heuristic.")
+        return _recommend_companies_fallback(student_profile)
+
+def _recommend_companies_fallback(student_profile):
     cgpa = student_profile.get('cgpa', 7.0)
     coding = student_profile.get('coding', 50.0)
     aptitude = student_profile.get('aptitude', 50.0)
