@@ -746,7 +746,6 @@ with st.sidebar:
             "Skill Gap & Career Roadmap",
             "Resume ATS Scorer",
             "AI Interview Coach",
-            "Model Benchmarking",
             "History & Data Management"
         ]
     else:
@@ -906,7 +905,7 @@ elif routing_selection == "Predict Placement":
     st.markdown("Input student parameters to forecast placement outcomes, calculate salary packages, and render visual SHAP attribution charts.")
     
     if not predictor.is_ready():
-        st.error("🤖 Machine Learning Models are not loaded. Please go to the **Model Benchmarking** tab to train models first.")
+        st.error("🤖 Machine Learning Models are not loaded. Please ensure the pre-trained model files exist in the 'models/' directory.")
     else:
         # Form for student profile input
         with st.form("student_profile_form"):
@@ -1379,99 +1378,7 @@ elif routing_selection == "Resume ATS Scorer":
                 for sug in resume_analysis['suggestions']:
                     st.markdown(f"- {sug}")
 
-# ==========================================
-# MODULE 12: Model Benchmarking
-# ==========================================
-elif routing_selection == "Model Benchmarking":
-    st.title("Machine Learning Models Benchmarking & Comparison")
-    st.markdown("Train, evaluate, and benchmark multiple ML classifiers. Auto-select the best model based on F1-Score metrics.")
-    
-    # Check if model_metrics.json exists
-    metrics_path = "models/model_metrics.json"
-    if not os.path.exists(metrics_path):
-        st.warning("No pre-trained model metadata found. Click the button below to train models using the enriched student dataset.")
-        train_button = st.button("Train Model Suite (Logistic Regression, Trees, Ensemble, XGBoost)", use_container_width=True)
-        if train_button:
-            with st.spinner("Executing Grid Search & model training..."):
-                from src.model_training import train_and_evaluate_models
-                try:
-                    train_and_evaluate_models()
-                    st.success("Models trained and cached successfully! Refreshing dashboard...")
-                    st.rerun()
-                except Exception as train_ex:
-                    st.error(f"Training failed: {train_ex}")
-    else:
-        # Load metrics
-        with open(metrics_path, "r") as f:
-            all_metrics = json.load(f)
-            
-        st.success(f"**Auto-selected Best Classifier:** `{all_metrics.get('best_model', 'N/A')}`")
-        
-        # 1. Comparison Table
-        table_rows = []
-        for name, data in all_metrics.items():
-            if name not in ['best_model', 'salary_metrics']:
-                table_rows.append({
-                    'Model Name': name,
-                    'Accuracy': f"{data['accuracy']*100:.2f}%",
-                    'Precision': f"{data['precision']*100:.2f}%",
-                    'Recall': f"{data['recall']*100:.2f}%",
-                    'F1-Score': f"{data['f1_score']*100:.2f}%",
-                    'ROC AUC': f"{data['roc_auc']:.4f}"
-                })
-        df_metrics = pd.DataFrame(table_rows)
-        with st.container(border=True):
-            st.subheader("Classifier Suite Metrics Comparison Table")
-            st.dataframe(df_metrics, use_container_width=True, hide_index=True)
-        
-        st.write("---")
-        
-        # 2. ROC Curves & Confusion Matrices
-        col_curve1, col_curve2 = st.columns(2)
-        
-        with col_curve1:
-            with st.container(border=True):
-                st.subheader("Classifier ROC Curves")
-                fig_roc = go.Figure()
-                for name, data in all_metrics.items():
-                    if name not in ['best_model', 'salary_metrics']:
-                        fig_roc.add_trace(go.Scatter(
-                            x=data['fpr'],
-                            y=data['tpr'],
-                            mode='lines',
-                            name=f"{name} (AUC={data['roc_auc']:.3f})"
-                        ))
-                fig_roc.add_shape(
-                    type='line', line=dict(dash='dash', color='grey'),
-                    x0=0, x1=1, y0=0, y1=1
-                )
-                fig_roc.update_layout(
-                    xaxis_title="False Positive Rate",
-                    yaxis_title="True Positive Rate",
-                    margin=dict(l=10, r=10, t=10, b=10),
-                    height=350,
-                    legend=dict(yanchor="bottom", y=0.01, xanchor="right", x=0.99)
-                )
-                st.plotly_chart(fig_roc, use_container_width=True)
-            
-        with col_curve2:
-            with st.container(border=True):
-                st.subheader("Confusion Matrix View")
-                # Select model confusion matrix to view
-                models_list = [name for name in all_metrics.keys() if name not in ['best_model', 'salary_metrics']]
-                selected_model = st.selectbox("Select Model for Confusion Matrix", options=models_list)
-                
-                cm = all_metrics[selected_model]['confusion_matrix']
-                cm_df = pd.DataFrame(cm, columns=["Predicted Not Placed", "Predicted Placed"], index=["Actual Not Placed", "Actual Placed"])
-                
-                fig_cm = px.imshow(
-                    cm_df,
-                    text_auto=True,
-                    color_continuous_scale='Blues',
-                    labels=dict(x="Predicted Class", y="Actual Class")
-                )
-                fig_cm.update_layout(margin=dict(l=10, r=10, t=10, b=10), height=300)
-                st.plotly_chart(fig_cm, use_container_width=True)
+
 
 # ==========================================
 # MODULE 11: AI Interview Coach
