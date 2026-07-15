@@ -10,7 +10,7 @@ import os
 import json
 
 # Import custom modules
-from src.data_manager import save_prediction, get_prediction_history, search_history, clear_history, validate_csv_data
+from src.data_manager import save_prediction, get_prediction_history, search_history, clear_history
 from src.data_preprocessing import DEPARTMENTS
 from src.prediction import PlacementPredictor
 from src.explainability import PlacementExplainer
@@ -1639,72 +1639,57 @@ elif routing_selection == "AI Interview Coach":
 # ==========================================
 elif routing_selection == "History & Data Management":
     st.title("History & Data Management")
-    st.markdown("Upload new custom CSV datasets for preprocessing/validation, query past predictions from SQLite, or export history records.")
+    st.markdown("Query, search, export, or manage past student placement predictions stored in the SQLite database.")
     
-    tab1, tab2 = st.tabs(["Upload & Validate Dataset", "SQLite Prediction History"])
-    
-    with tab1:
-        with st.container(border=True):
-            st.subheader("Upload Custom Student CSV")
-            st.markdown("""
-            Ensure your CSV matches the schema format of `Placement_Data_Enriched.csv`. 
-            Required columns include: *Name, Age, Department, CGPA, Attendance, Aptitude Score, Coding Score, 
-            Communication Score, Technical Interview Score, Internship, Certifications, Projects Completed, 
-            Programming Languages Known, Soft Skills Rating, Extra Curricular Activities*.
-            """)
+    with st.container(border=True):
+        st.subheader("SQLite Saved Prediction History")
+        
+        # Load history
+        df_history = get_prediction_history()
+        
+        # Layout Search and Metrics side-by-side
+        col_ctrl1, col_ctrl2 = st.columns([4, 1])
+        with col_ctrl1:
+            search_query = st.text_input(
+                "Search Student Name or Department", 
+                value="", 
+                placeholder="Type name or department to search..."
+            )
+        with col_ctrl2:
+            total_records = len(df_history) if not df_history.empty else 0
+            st.metric(label="Total Profiles", value=total_records)
             
-            uploaded_csv = st.file_uploader("Choose a CSV file", type=["csv"])
-            if uploaded_csv is not None:
-                raw_upload = pd.read_csv(uploaded_csv)
-                is_valid, report, cleaned_df = validate_csv_data(raw_upload)
-                
-                if not is_valid:
-                    st.error(f"Validation failed: {report}")
-                else:
-                    st.success("CSV Schema Check Passed!")
-                    st.info(report)
-                    
-                    st.write("---")
-                    st.write("**Dataset Preview:**")
-                    st.dataframe(cleaned_df.head(10), use_container_width=True)
-                    
-                    # Check metrics summaries on new dataset
-                    st.write("**Summary Statistics:**")
-                    st.write(cleaned_df.describe())
-                
-    with tab2:
-        with st.container(border=True):
-            st.subheader("SQLite Saved Prediction History")
+        # Execute search if query provided
+        if search_query:
+            df_history_filtered = search_history(search_query)
+        else:
+            df_history_filtered = df_history
             
-            # Search query
-            search_query = st.text_input("Search Student Name or Department", value="")
-            
+        if df_history_filtered.empty:
             if search_query:
-                df_history = search_history(search_query)
+                st.info(f"No records found matching query: '{search_query}'")
             else:
-                df_history = get_prediction_history()
-                
-            if df_history.empty:
                 st.info("No prediction history recorded yet. Run student profiles in the prediction tab to populate this database.")
-            else:
-                st.dataframe(df_history, use_container_width=True)
-                
-                h_col1, h_col2 = st.columns(2)
-                with h_col1:
-                    # Export to CSV
-                    csv_buffer = io.StringIO()
-                    df_history.to_csv(csv_buffer, index=False)
-                    st.download_button(
-                        label="Export History to CSV",
-                        data=csv_buffer.getvalue(),
-                        file_name="Student_Placement_History.csv",
-                        mime="text/csv",
-                        use_container_width=True
-                    )
-                    
-                with h_col2:
-                    # Clear Database
-                    if st.button("Clear Entire History Database", use_container_width=True, type="secondary"):
-                        clear_history()
-                        st.success("Prediction database history wiped successfully!")
-                        st.rerun()
+        else:
+            # Display history records
+            st.dataframe(df_history_filtered, use_container_width=True)
+            
+            st.write("") # Add spacing
+            
+            # Action controls in aligned columns at the bottom
+            col_act1, col_act2 = st.columns(2)
+            with col_act1:
+                csv_buffer = io.StringIO()
+                df_history_filtered.to_csv(csv_buffer, index=False)
+                st.download_button(
+                    label="📥 Export Current View to CSV",
+                    data=csv_buffer.getvalue(),
+                    file_name="Student_Placement_History.csv",
+                    mime="text/csv",
+                    use_container_width=True
+                )
+            with col_act2:
+                if st.button("🗑️ Clear Entire History Database", use_container_width=True, type="secondary"):
+                    clear_history()
+                    st.success("Prediction database history wiped successfully!")
+                    st.rerun()
