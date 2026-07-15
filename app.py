@@ -35,7 +35,7 @@ if 'logged_in' not in st.session_state:
 if 'user_role' not in st.session_state:
     st.session_state.user_role = None
 if 'theme_mode' not in st.session_state:
-    st.session_state.theme_mode = 'dark'
+    st.session_state.theme_mode = 'light'
 if 'landing_view' not in st.session_state:
     st.session_state.landing_view = 'home'
 
@@ -769,10 +769,7 @@ with st.sidebar:
     elif "Interview" in nav_selection:
         routing_selection = "AI Interview Coach"
         
-    st.write("---")
-    # Theme toggler
-    mode_emoji = "Light" if st.session_state.theme_mode == 'dark' else "Dark"
-    st.button(f"Switch to {mode_emoji} Mode", on_click=toggle_theme, use_container_width=True)
+
     
     st.write("---")
     if st.button("Log Out", use_container_width=True):
